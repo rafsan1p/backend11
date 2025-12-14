@@ -26,6 +26,26 @@ async function run() {
     await client.connect();
     // Send a ping to confirm a successful connection
 
+    const database = client.db('missionscic11DB');
+    const userCollections = database.collection('user');
+
+    app.post('/users', async (req, res) => {
+      const userInfo = req.body;
+      userInfo.role = 'buyer';
+      userInfo.createdAt = new Date();
+
+      const result = await userCollections.insertOne(userInfo);
+      res.send(result);
+    });
+
+    app.get('/users/role/:email', async (req, res) => {
+      const {email} = req.params;
+      const query = { email: email };
+      const result = await userCollections.findOne(query);
+      console.log(result);
+      res.send(result);
+    });
+
 
 
 
