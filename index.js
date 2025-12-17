@@ -66,6 +66,11 @@ async function run() {
       res.send(result);
     });
 
+    app.get('/users', verifyFBToken, async(req, res)=>{
+      const result = await userCollections.find().toArray();
+      res.status(200).send(result)
+    })
+
     app.get('/users/role/:email', async (req, res) => {
 
       const {email} = req.params;
@@ -74,6 +79,19 @@ async function run() {
       console.log(result);
       res.send(result);
     });
+
+    app.patch('/update/user/status', verifyFBToken, async(req, res)=>{
+      const {email, status} = req.query;
+      const query = {email:email};
+      const updateStatus = {
+        $set: {
+          status:status
+        }
+      }
+      const result = await userCollections.updateOne(query, updateStatus)
+      res.send(result)
+
+    })
 
     //Request
     app.post('/requests', verifyFBToken, async(req, res) =>{
