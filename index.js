@@ -63,7 +63,7 @@ async function run() {
     app.post('/users', async (req, res) => {
       const userInfo = req.body;
       userInfo.createdAt = new Date();
-      userInfo.role = 'donor'
+      userInfo.role = userInfo?.role || 'donor'
       userInfo.status = 'active'
 
       const result = await userCollections.insertOne(userInfo);
@@ -123,6 +123,29 @@ async function run() {
       res.send({request: result, totalRequest})
 
     })
+    app.get('/search-requests', async(req, res)=>{
+      const {bloodGroup, district, upazila} = req.query;
+
+      const query = {};
+
+      if(!query){
+        return ;
+      }
+      if(bloodGroup){
+        const fixed = bloodGroup.replace(/ /g, "+").trim();
+        query.blood_group = fixed;
+      }
+      if(district){
+        query.recipient_district = district;
+      }
+      if(upazila){
+        query.recipient_upazila = upazila;
+      }
+      console.log(query);
+      const result = await requestsCollections.find(query).toArray();
+      res.send(result);
+    })
+
 
     //payments
     app.post('/create-payment-checkout', async(req, res)=>{
